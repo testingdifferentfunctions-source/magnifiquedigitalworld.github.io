@@ -38,7 +38,7 @@ const About = () => {
               {t('about.contact')}{' '}
               <a
                 href={emailLink.url}
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium break-all"
               >
                 {emailLink.url.replace(/^mailto:/i, '')}
               </a>
