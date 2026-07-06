@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import TagInput from '@/components/TagInput';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -28,9 +29,15 @@ const ArticleEditor = () => {
   const updateArticle = useUpdateArticle();
   const deleteArticle = useDeleteArticle();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+  // Ukrainian (base) fields
+  const [titleUk, setTitleUk] = useState('');
+  const [descriptionUk, setDescriptionUk] = useState('');
+  const [contentUk, setContentUk] = useState('');
+  // English fields
+  const [titleEn, setTitleEn] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
+  const [contentEn, setContentEn] = useState('');
+
   const [imageUrl, setImageUrl] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
   const [published, setPublished] = useState(false);
@@ -48,9 +55,12 @@ const ArticleEditor = () => {
 
   useEffect(() => {
     if (existingArticle) {
-      setTitle(existingArticle.title);
-      setDescription(existingArticle.description);
-      setContent(existingArticle.content);
+      setTitleUk(existingArticle.title_uk ?? existingArticle.title ?? '');
+      setDescriptionUk(existingArticle.description_uk ?? existingArticle.description ?? '');
+      setContentUk(existingArticle.content_uk ?? existingArticle.content ?? '');
+      setTitleEn(existingArticle.title_en ?? '');
+      setDescriptionEn(existingArticle.description_en ?? '');
+      setContentEn(existingArticle.content_en ?? '');
       setImageUrl(existingArticle.image_url);
       setCategoryId(existingArticle.category_id || '');
       setPublished(existingArticle.published);
@@ -72,11 +82,12 @@ const ArticleEditor = () => {
 
   const validateForm = (): boolean => {
     const sanitizedImageUrl = sanitizeUrl(imageUrl);
-    
+
+    // Ukrainian is required (base language)
     const result = articleSchema.safeParse({
-      title: title.trim(),
-      description: description.trim(),
-      content,
+      title: titleUk.trim(),
+      description: descriptionUk.trim(),
+      content: contentUk,
       image_url: sanitizedImageUrl || undefined,
       category_id: categoryId || null,
       published,
@@ -98,18 +109,26 @@ const ArticleEditor = () => {
 
   const handleSave = async () => {
     if (!validateForm()) {
-      toast.error('Виправте помилки у формі');
+      toast.error('Виправте помилки у формі (українська версія обов’язкова)');
       return;
     }
 
     setSaving(true);
     try {
       const sanitizedImageUrl = sanitizeUrl(imageUrl);
-      
+
       const articleData = {
-        title: title.trim(),
-        description: description.trim(),
-        content: sanitizeHtml(content),
+        // Legacy columns kept in sync with Ukrainian (base) content
+        title: titleUk.trim(),
+        description: descriptionUk.trim(),
+        content: sanitizeHtml(contentUk),
+        // Per-language fields
+        title_uk: titleUk.trim(),
+        description_uk: descriptionUk.trim(),
+        content_uk: sanitizeHtml(contentUk),
+        title_en: titleEn.trim() || null,
+        description_en: descriptionEn.trim() || null,
+        content_en: contentEn.trim() ? sanitizeHtml(contentEn) : null,
         image_url: sanitizedImageUrl || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
         category_id: categoryId || null,
         published,
@@ -117,7 +136,7 @@ const ArticleEditor = () => {
         reads: existingArticle?.reads || 0,
         likes: existingArticle?.likes || 0,
         impressions: existingArticle?.impressions || 0,
-        share_count: (existingArticle as any)?.share_count || 0
+        share_count: existingArticle?.share_count || 0,
       };
 
       if (isEditing) {
@@ -137,7 +156,7 @@ const ArticleEditor = () => {
 
   const handleDelete = async () => {
     if (!confirm('Ви впевнені, що хочете видалити цю статтю?')) return;
-    
+
     try {
       await deleteArticle.mutateAsync(id!);
       toast.success('Статтю видалено');
@@ -174,48 +193,96 @@ const ArticleEditor = () => {
             <CardTitle>{isEditing ? 'Редагування статті' : 'Нова стаття'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">Заголовок</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                  if (errors.title) setErrors({ ...errors, title: '' });
-                }}
-                placeholder="Введіть заголовок статті"
-                maxLength={200}
-                className={`bg-background border-border ${errors.title ? 'border-destructive' : ''}`}
-              />
-              {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
-            </div>
+            <section className="space-y-6">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🇺🇦</span>
+                <h3 className="text-lg font-semibold">Українська (обов’язково)</h3>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Короткий опис</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                  if (errors.description) setErrors({ ...errors, description: '' });
-                }}
-                placeholder="Короткий опис для картки статті"
-                maxLength={500}
-                className={`bg-background border-border ${errors.description ? 'border-destructive' : ''}`}
-                rows={2}
-              />
-              {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
-              <p className="text-xs text-muted-foreground">{description.length}/500</p>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="title-uk">Заголовок (UA)</Label>
+                <Input
+                  id="title-uk"
+                  value={titleUk}
+                  onChange={(e) => {
+                    setTitleUk(e.target.value);
+                    if (errors.title) setErrors({ ...errors, title: '' });
+                  }}
+                  placeholder="Введіть заголовок статті"
+                  maxLength={200}
+                  className={`bg-background border-border ${errors.title ? 'border-destructive' : ''}`}
+                />
+                {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
+              </div>
 
-            <div className="space-y-2">
-              <Label>Вміст статті</Label>
-              <RichTextEditor
-                value={content}
-                onChange={setContent}
-                maxLength={50000}
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="description-uk">Короткий опис (UA)</Label>
+                <Textarea
+                  id="description-uk"
+                  value={descriptionUk}
+                  onChange={(e) => {
+                    setDescriptionUk(e.target.value);
+                    if (errors.description) setErrors({ ...errors, description: '' });
+                  }}
+                  placeholder="Короткий опис для картки статті"
+                  maxLength={500}
+                  className={`bg-background border-border ${errors.description ? 'border-destructive' : ''}`}
+                  rows={2}
+                />
+                {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                <p className="text-xs text-muted-foreground">{descriptionUk.length}/500</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Вміст статті (UA)</Label>
+                <RichTextEditor value={contentUk} onChange={setContentUk} maxLength={50000} />
+              </div>
+            </section>
+
+            <Separator />
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🇬🇧</span>
+                <h3 className="text-lg font-semibold">English (optional)</h3>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="title-en">Title (EN)</Label>
+                <Input
+                  id="title-en"
+                  value={titleEn}
+                  onChange={(e) => setTitleEn(e.target.value)}
+                  placeholder="Enter English title"
+                  maxLength={200}
+                  className="bg-background border-border"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description-en">Short description (EN)</Label>
+                <Textarea
+                  id="description-en"
+                  value={descriptionEn}
+                  onChange={(e) => setDescriptionEn(e.target.value)}
+                  placeholder="Card description in English"
+                  maxLength={500}
+                  className="bg-background border-border"
+                  rows={2}
+                />
+                <p className="text-xs text-muted-foreground">{descriptionEn.length}/500</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Article content (EN)</Label>
+                <RichTextEditor value={contentEn} onChange={setContentEn} maxLength={50000} />
+                <p className="text-xs text-muted-foreground">
+                  If left blank, Ukrainian text will be shown to English visitors.
+                </p>
+              </div>
+            </section>
+
+            <Separator />
 
             <div className="space-y-2">
               <Label>Зображення статті</Label>
@@ -256,7 +323,6 @@ const ArticleEditor = () => {
               />
             </div>
 
-
             <div className="flex items-center gap-3">
               <Switch
                 id="published"
@@ -273,3 +339,4 @@ const ArticleEditor = () => {
 };
 
 export default ArticleEditor;
+
