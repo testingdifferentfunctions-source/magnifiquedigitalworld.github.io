@@ -3,15 +3,12 @@ import SEO from "@/components/SEO";
 import ArticleCard from "@/components/ArticleCard";
 import { useTopArticlesByReads, Article } from "@/hooks/useArticles";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useArticlesTranslations } from "@/hooks/useArticleTranslation";
+import { localizeArticle } from "@/lib/localize";
 import { TrendingUp } from "lucide-react";
-import { useMemo } from "react";
 
 const Popular = () => {
   const { data: articles = [], isLoading } = useTopArticlesByReads(10);
   const { t, language } = useLanguage();
-  const articleIds = useMemo(() => articles.map(a => a.id), [articles]);
-  const { data: translationsMap = {} } = useArticlesTranslations(articleIds);
 
   return (
     <PageLayout>
@@ -37,20 +34,20 @@ const Popular = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((article: Article, index: number) => {
-            const tr = translationsMap[article.id];
+            const loc = localizeArticle(article, language);
             return (
-              <ArticleCard 
-                key={article.id} 
+              <ArticleCard
+                key={article.id}
                 article={{
                   id: article.id,
-                  title: (language === 'en' && tr?.title) ? tr.title : article.title,
-                  description: (language === 'en' && tr?.description) ? tr.description : article.description,
+                  title: loc.title,
+                  description: loc.description,
                   image: article.image_url,
                   likes: article.likes,
                   reads: article.reads,
                   category: article.category_id || ''
-                }} 
-                index={index} 
+                }}
+                index={index}
               />
             );
           })}
@@ -61,3 +58,4 @@ const Popular = () => {
 };
 
 export default Popular;
+
