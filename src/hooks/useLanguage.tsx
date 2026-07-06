@@ -56,7 +56,7 @@ const translations: Record<Language, Record<string, string>> = {
     'article.not_found': 'Статтю не знайдено',
     'article.not_found_desc': 'На жаль, ця стаття не існує або була видалена.',
     'article.go_home': 'Повернутись на головну',
-    'article.views': 'переглядів',
+    'article.share': 'Поділитися',
     'article.translating': 'Перекладається...',
     'article.translate_error': 'Помилка перекладу',
 
@@ -132,7 +132,7 @@ const translations: Record<Language, Record<string, string>> = {
     'article.not_found': 'Article not found',
     'article.not_found_desc': 'Sorry, this article does not exist or has been deleted.',
     'article.go_home': 'Go to homepage',
-    'article.views': 'views',
+    'article.share': 'Share',
     'article.translating': 'Translating...',
     'article.translate_error': 'Translation error',
 
@@ -194,3 +194,4 @@ export const useLanguage = () => {
   }
   return context;
 };
+
