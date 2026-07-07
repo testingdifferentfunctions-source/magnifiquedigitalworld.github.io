@@ -15,6 +15,7 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import ArticleEditor from "./pages/ArticleEditor";
 import Article from "./pages/Article";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/admin/editor" element={<ArticleEditor />} />
               <Route path="/admin/editor/:id" element={<ArticleEditor />} />
               <Route path="/article/:id" element={<Article />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
@@ -50,3 +52,6 @@ const App = () => (
 );
 
 export default App;
+
+// Triggering GitHub sync for Vercel
+
