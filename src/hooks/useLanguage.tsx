@@ -18,6 +18,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.about': 'Про платформу',
     'nav.admin': 'Адмін',
     'nav.logout': 'Вийти',
+    'nav.privacy': 'Політика конфіденційності',
 
     // Index page
     'index.title': 'Останні статті про Python',
@@ -94,6 +95,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.about': 'About',
     'nav.admin': 'Admin',
     'nav.logout': 'Logout',
+    'nav.privacy': 'Privacy Policy',
 
     // Index page
     'index.title': 'Latest Python Articles',
