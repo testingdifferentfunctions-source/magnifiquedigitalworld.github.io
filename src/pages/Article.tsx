@@ -167,13 +167,20 @@ const Article = () => {
           />
         </div>
 
-        <div 
-          className="prose prose-lg dark:prose-invert max-w-none
+        <div
+          className="prose prose-lg dark:prose-invert max-w-none article-content
             [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:mt-4 [&_h4]:mb-2
             [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80"
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(displayContent || '', {
-            ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'img', 'a', 'span', 'div'],
-            ALLOWED_ATTR: ['class', 'href', 'src', 'alt', 'title', 'target', 'rel'],
+            ALLOWED_TAGS: [
+              'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'b', 
+              'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'table', 
+              'span' /* Додано span для збереження кольорів тексту */
+            ],
+            ALLOWED_ATTR: [
+              'class', 'href', 'src', 'alt', 'title', 'target', 'rel', 
+              'style' /* Додано style, щоб DOMPurify не вирізав кольори */
+            ],
           }) }}
         />
       </article>
