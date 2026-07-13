@@ -122,7 +122,7 @@ const translations: Record<Language, Record<string, string>> = {
     'favorites.subtitle': 'Top 10 articles by number of likes',
 
     // Sections page
-    'sections.title': 'Programming Sections',
+    'sections.title': 'Sections',
     'sections.subtitle': 'Choose a topic that interests you',
 
     // About page
