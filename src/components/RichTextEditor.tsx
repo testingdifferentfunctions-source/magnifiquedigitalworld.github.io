@@ -203,7 +203,7 @@ const applyPurpleAccent = () => {
         contentEditable
         onInput={handleInput}
         dir="ltr"
-        className="min-h-[300px] p-4 bg-background focus:outline-none prose prose-sm dark:prose-invert max-w-none
+        className="article-content min-h-[300px] p-4 bg-background focus:outline-none prose prose-sm dark:prose-invert max-w-none
           [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-6
           [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5
           [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4
